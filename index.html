@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel='manifest' href='manifest.webmanifest'>
+	<meta name="theme-color" content="#317EFB" />
+	<link rel="shortcut icon" href="./img/icon.png" type="image/x-icon">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Contrail+One&display=swap" rel="stylesheet">
+	<link href="output.css" rel="stylesheet">
+	<title>Pop art meteo</title>
+</head>
+
+<body class="bg-contain" style="background-image: url(img/bd-dots.png)">
+
+	<div class="container max-w-3xl">
+
+		<div class="grid gap-6 md:grid-cols-2 md:gap-8">
+
+			<div class="">
+				<input type="text" name="" id="ville" class="w-full p-2 text-2xl text-center">
+			</div>
+			<div class="">
+				<a class="btn btn-success" id="go" href=""><button
+						class="rounded-full bg-mauve p-2 w-full h-full border-2 border-black shadow text-xl">GO</button></a>
+			</div>
+
+
+			<div class="flex justify-around col-span-2 bg-yellow text-center text-4xl rounded-full p-4 shadow ">
+				<div class="info_temp"></div>
+				<div class="info_1"></div>
+				<div class="info_2"></div>
+			</div>
+
+			<div class="col-span-1/2">
+				<div class="info_6 bg-white bg-contain rounded-full shadow"><img src="" alt="" id="info_6" class="w-full h-full">
+				</div>
+			</div>
+
+			<div class="col-span-1/2 bg-blue text-center text-xl rounded-full my-auto mx-0 p-6 shadow md:text-4xl">
+				<div class="info_5"><span></span> </div>
+			</div>
+
+			<div class="col-span-2 flex justify-around bg-mauve text-center text-sm rounded-full p-4 shadow md:text-md">
+				<div class="">
+					<div class="info_jour_0 underline"></div>
+					<div class="info_min_0"></div>
+					<div class="info_max_0"></div>
+				</div>
+				<div class="">
+					<div class="info_jour_1 underline"></div>
+					<div class="info_min_1"></div>
+					<div class="info_max_1"></div>
+				</div>
+				<div class="">
+					<div class="info_jour_2 underline"></div>
+					<div class="info_min_2"></div>
+					<div class="info_max_2"></div>
+				</div>
+				<div class="">
+					<div class="info_jour_3 underline"></div>
+					<div class="info_min_3"></div>
+					<div class="info_max_3"></div>
+				</div>
+				<div class="">
+					<div class="info_jour_4 underline"></div>
+					<div class="info_min_4"></div>
+					<div class="info_max_4"></div>
+				</div>
+			</div>
+
+			<div class="col-span-1/2 bg-yellow text-center text-md p-4 rounded-full shadow md:text-2xl">
+				<div class="info_3">Levé du soleil : <span></span> </div>
+			</div>
+
+			<div class="col-span-1/2 bg-red text-center text-md p-4 rounded-full shadow md:text-2xl">
+				<div class="info_4">Couché du solei : <span></span></div>
+			</div>
+
+
+			<div class="col-span-2 mx-auto mt-4 px-6">
+				<button id="btnAdd" class="bg-blue rounded-full text-white py-2 px-4 shadow">
+					Installer l'appli
+				</button>
+				<button id="btnNoAdd" class="bg-black rounded-full text-white py-2 px-4 shadow">
+					Ne pas installer
+				</button>
+			</div>
+		</div>
+
+
+
+	</div>
+	</div>
+
+	</div>
+
+
+	<script src="./js/jquery-3.6.1.min.js"></script>
+	<script src="./js/meteo.js"></script>
+	<script src="service-worker.js"></script>
+
+	<script>
+		// enregistrement du service worker
+		if ('serviceWorker' in navigator) {
+			console.log('CLIENT: service worker registration in progress.');
+			navigator.serviceWorker.register('/service-worker.js').then(function () {
+				console.log('CLIENT: service worker registration complete!');
+			}, function () {
+				console.log('CLIENT: service worker registration failure.');
+			});
+		} else {
+			console.log('CLIENT: service worker is not supported.');
+		}
+
+
+
+		// Initialize deferredPrompt for use later to show browser install prompt.
+		let deferredPrompt;
+
+		window.addEventListener('beforeinstallprompt', (e) => {
+			// Prevent the mini-infobar from appearing on mobile
+			e.preventDefault();
+			// Stash the event so it can be triggered later.
+			deferredPrompt = e;
+			// Update UI notify the user they can install the PWA
+			showInstallPromotion();
+			// Optionally, send analytics event that PWA install promo was shown.
+			console.log('beforeinstallprompt event was fired: ');
+		})
+
+
+		// fonction qui montre le bouton isntallation
+		function showInstallPromotion() {
+			console.log("ok on peut installer");
+
+			$('#btnAdd').show();
+			$('#btnNoAdd').hide();
+
+		}
+
+		var btnAdd = document.getElementById("btnAdd");
+
+		btnAdd.addEventListener('click', (e) => {
+			// hide our user interface that shows our A2HS button
+			btnAdd.style.display = 'none';
+			// Show the prompt
+			deferredPrompt.prompt();
+			// Wait for the user to respond to the prompt
+			deferredPrompt.userChoice
+				.then((choiceResult) => {
+					if (choiceResult.outcome === 'accepted') {
+						console.log('User accepted the A2HS prompt');
+					} else {
+						console.log('User dismissed the A2HS prompt');
+					}
+					deferredPrompt = null;
+				});
+		});
+
+
+		var btnNoAdd = document.getElementById("btnNoAdd");
+
+		btnNoAdd.addEventListener('click', (e) => {
+			alert("Installation uniquement possible sur Chromium et Android. Si vous ne voyez pas le bouton d'installation vous êtes probablement sur iOS sur mobile ou sur un navigateur non-Chromium sur Desktop.");
+		});
+	</script>
+</body>
+
+</html>
